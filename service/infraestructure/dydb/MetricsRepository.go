@@ -10,20 +10,23 @@ import (
 )
 
 type MetricsRepository struct {
-	AwsSession *session.Session
-	TableName  string
+	AwsSession       *session.Session
+	TableName        string
+	MemoryRepository repositories.IndexMemoryRepository
 }
 
-func NewMetricsRepository(awsSession *session.Session, tableName string) repositories.DocumentMetricsRepository {
+func NewMetricsRepository(awsSession *session.Session, tableName string, memoryRepository repositories.IndexMemoryRepository) repositories.DocumentMetricsRepository {
 	return MetricsRepository{
-		AwsSession: awsSession,
-		TableName:  tableName,
+		AwsSession:       awsSession,
+		TableName:        tableName,
+		MemoryRepository: memoryRepository,
 	}
 }
 
 func (i MetricsRepository) Save(document domain.NormalizedDocument) error {
 
 	item, err := dynamodbattribute.MarshalMap(document)
+	i.MemoryRepository.Save("metrics"+document.Id, document)
 
 	if err != nil {
 		return err

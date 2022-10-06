@@ -11,6 +11,7 @@ import (
 	"lambda-metrics-nir/service/infraestructure/dto"
 	"lambda-metrics-nir/service/infraestructure/dydb"
 	zapplog "lambda-metrics-nir/service/infraestructure/log"
+	"lambda-metrics-nir/service/infraestructure/memory"
 )
 
 var TableName string
@@ -29,7 +30,7 @@ func handler(ctx context.Context, event events.SQSEvent) error {
 		return err
 	}
 
-	repository := dydb.NewMetricsRepository(awsSession, TableName)
+	repository := dydb.NewMetricsRepository(awsSession, TableName, memory.NewSpeedupRepository())
 	service := service.NewMetricsService(logger, repository)
 
 	logger.Info("Lambda Accepted Request")
